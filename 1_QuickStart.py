@@ -5,7 +5,7 @@
 #
 
 #
-# Start Torch
+# QuickStart
 #
 
 ## Working with data
