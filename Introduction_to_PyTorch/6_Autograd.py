@@ -16,6 +16,7 @@
 
 # 가장 간단한 단일 층 뉴럴 네트워크를 고려해보자.
 
+from importlib.metadata import requires
 import torch
 
 x = torch.ones(5)
@@ -109,4 +110,28 @@ print(z_det.requires_grad)
 # Optional Reading: Tensor Gradients and Jacobian Products
 
 # 많은 경우, scalar loss function을 사용하고, 몇몇 파라미터에 대해 gradient를 계산해야 할 필요가 있다.
-# 그러나, 출력
+# 그러나, 출력 함수가 임의의 텐서인 경우가 있다. 이러한 경우, 파이토치는 Jacobian product를 연산할 수 있게 한다.
+# 이것은 실제 gradient가 아니다.
+
+# Jacobian matrix를 계산하는 대신, 파이토치는 Jacobian Product를 계산한다.
+# 이것은 벡터를 매개변수로 가지는 backward를 통해 실행된다.
+
+inp = torch.eye(5, requires_grad=True)
+out = (inp + 1).pow(2)
+out.backward(torch.ones_like(inp), retain_graph=True)
+print(f"First call\n{inp.grad}\n")
+out.backward(torch.ones_like(inp), retain_graph=True)
+print(f"Second call\n{inp.grad}\n")
+inp.grad.zero_()
+out.backward(torch.ones_like(inp), retain_graph=True)
+print(f"Call after zeroing gradients\n{inp.grad}")
+
+# backward를 같은 변수에 대하여 두 번째 실행하는 경우 gradient의 값이 달라진다.
+# 이것은 backward propagation을 실행할 때, 파이토치가 gradient를 축적하기 때문에 발생한다.
+# 계산된 gradient의 값이 computational graph의 모든 잎 노드의 grad 속성에 더해진다.
+# 적합한 gradient를 계산하고 싶다면, 먼저 grad 속성을 0으로 만들어야 한다.
+# 실제 학습에서 optimizer가 이것을 도와준다.
+
+# 이전에 backward() 함수를 파라미터 없이 실행했었다.
+# 이것은 본질적으로 backward(torch.tensor(1.0))을 실행하는 것과 동일하다.
+# 이는 뉴럴 네트워크 학습 과정에서 loss와 같은 scalr-valued function의 경우 gradient를 계산하는 데 유용한 방식이다.
