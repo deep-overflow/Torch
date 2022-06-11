@@ -1,7 +1,5 @@
-Torch
-=====
+# Torch
 This repository is for learning pytorch
----------------------------------------
 
 ## 1. Tutorials
 
