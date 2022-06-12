@@ -101,4 +101,6 @@ for epoch in epochs:
 
 # Working with Scaled Gradients
 
-# 
+# Gradient accumulation
+
+# Gradient accumulation은
